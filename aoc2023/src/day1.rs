@@ -107,6 +107,6 @@ fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Erro
 }
 
 fn main() {
-    // let _ = read_file_line_by_line("input_d1p1");
-    let _ = read_file_line_by_line("input_file_with_words");
+    let _ = read_file_line_by_line("input_d1p1");
+    // let _ = read_file_line_by_line("input_file_with_words");
 }
