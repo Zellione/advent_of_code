@@ -1,6 +1,6 @@
-use std::io::BufReader;
-use std::io::BufRead;
 use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 
 fn print_array(pattern: &[char; num_rows() * num_columns()]) {
     for i in 0..num_rows() {
@@ -33,14 +33,19 @@ fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Erro
     Ok(())
 }
 
-fn is_num_valid(pattern: &[char; num_rows() * num_columns()], pos_row: usize, pos_col: usize, width: usize) -> bool {
+fn is_num_valid(
+    pattern: &[char; num_rows() * num_columns()],
+    pos_row: usize,
+    pos_col: usize,
+    width: usize,
+) -> bool {
     let mut pos_row_low = pos_row;
     if pos_row_low != 0 {
         pos_row_low -= 1;
     }
 
     let mut pos_row_high = pos_row;
-    if pos_row_high <= pattern.len() - 1 {
+    if pos_row_high <= num_rows() - 1 {
         pos_row_high += 2;
     }
 
@@ -85,7 +90,7 @@ fn iterate_nums(pattern: &[char; num_rows() * num_columns()]) {
                 if is_num_valid(pattern, i_row, i_col - number.len(), number.len()) {
                     sum += num;
 
-                    println!("Found valid number: {}", num);
+                    // println!("Found valid number: {}", num);
                 }
 
                 number = String::new();
@@ -97,19 +102,20 @@ fn iterate_nums(pattern: &[char; num_rows() * num_columns()]) {
     println!("The sum of valid numbers is: {}", sum);
 }
 
+// WARN: Input has 141 rows
 const fn num_rows() -> usize {
-    const ROWS: usize = 141;
+    const ROWS: usize = 10;
 
     ROWS
 }
 
+// WARN: Input has 141 cols
 const fn num_columns() -> usize {
-    const COLUMNS: usize = 141;
+    const COLUMNS: usize = 10;
 
     COLUMNS
 }
 
-
 fn main() {
-    let _ = read_file_line_by_line("src/day3/day3_input");
+    let _ = read_file_line_by_line("src/day3/day3_calib");
 }
