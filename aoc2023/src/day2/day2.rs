@@ -1,16 +1,16 @@
-use std::fs::File;
-use std::io::BufRead;
 use std::io::BufReader;
+use std::io::BufRead;
+use std::fs::File;
 
 #[derive(Copy, Clone)]
 struct Game {
     min_red: u32,
     min_green: u32,
     min_blue: u32,
-    is_valid: bool,
+    is_valid: bool
 }
 
-fn check_red(to_test: u32, game: &mut Game) -> &Game {
+fn check_red(to_test: u32, game: &mut  Game) -> &Game {
     let num_of_red: &'static u32 = &12;
 
     game.is_valid = game.is_valid && !(to_test > *num_of_red);
@@ -44,14 +44,15 @@ fn check_blue(to_test: u32, game: &mut Game) -> &Game {
 }
 
 fn is_game_valid(game: &str) -> Game {
+
     let offset = game.find(':').unwrap();
     let mut game = String::from(game);
     let _: Vec<_> = game.drain(..(offset + 2)).collect();
     let mut game_result = Game {
-        min_red: 0,
-        min_green: 0,
-        min_blue: 0,
-        is_valid: true,
+        min_red : 0,
+        min_green : 0,
+        min_blue : 0,
+        is_valid : true
     };
 
     let subsets_of_cubes: Vec<&str> = game.split(';').collect();
@@ -66,7 +67,7 @@ fn is_game_valid(game: &str) -> Game {
                 "red" => game_result = *check_red(num, &mut game_result),
                 "green" => game_result = *check_green(num, &mut game_result),
                 "blue" => game_result = *check_blue(num, &mut game_result),
-                _ => println!("what happened?"),
+                _ => println!("what happened?")
             }
         }
     }
