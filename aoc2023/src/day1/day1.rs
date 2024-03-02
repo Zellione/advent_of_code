@@ -1,6 +1,6 @@
-use std::io::BufReader;
-use std::io::BufRead;
 use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 
 fn get_number_word_vec() -> Vec<&'static str> {
     let mut number_strings: Vec<&str> = Vec::new();
@@ -30,7 +30,7 @@ fn find_first_number(line: &str) -> char {
         index = result.unwrap();
     }
 
-    for (i,filter) in number_strings.iter().enumerate() {
+    for (i, filter) in number_strings.iter().enumerate() {
         let pos = line.find(filter).unwrap_or(usize::MAX);
         if pos < index {
             index = pos;
@@ -61,7 +61,7 @@ fn find_last_number(line: &str) -> char {
         index = result.unwrap();
     }
 
-    for (i,filter) in number_strings.iter().enumerate() {
+    for (i, filter) in number_strings.iter().enumerate() {
         let pos = line.rfind(filter).unwrap_or(usize::MAX);
 
         if pos > index && pos < usize::MAX {
@@ -85,7 +85,9 @@ fn find_numbers(line: &str) -> u32 {
     let first_number = find_first_number(&line);
     let last_number = find_last_number(&line);
 
-    (format!("{}{}", first_number, last_number)).parse::<u32>().unwrap()
+    (format!("{}{}", first_number, last_number))
+        .parse::<u32>()
+        .unwrap()
 }
 
 fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Error>> {
