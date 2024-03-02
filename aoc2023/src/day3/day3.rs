@@ -183,14 +183,12 @@ fn iterate_nums(pattern: &[char; num_rows() * num_columns()]) {
     println!("The sum of valid gear products is: {}", gear_sum);
 }
 
-// WARN: Input has 141 rows
 const fn num_rows() -> usize {
     const ROWS: usize = 141;
 
     ROWS
 }
 
-// WARN: Input has 141 cols
 const fn num_columns() -> usize {
     const COLUMNS: usize = 141;
 
