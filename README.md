@@ -3,5 +3,5 @@
 Execute days by typing:
 
 ``
-cargo run --bin dayX
+cargo run
 ``
