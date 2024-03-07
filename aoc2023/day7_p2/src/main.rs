@@ -6,7 +6,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 enum HandType {
     FiveOfAKind,
     FourOfAKind,
@@ -93,22 +93,74 @@ impl Hand {
             }
         }
         let mut sortable: Vec<u8> = Vec::new();
-        for (_, count) in cards_by_count {
-            sortable.push(count);
+        let mut count_jays: u8 = 0;
+        for (card, count) in cards_by_count {
+            if card != 'J' {
+                sortable.push(count);
+            }
+
+            if card == 'J' {
+                count_jays = count;
+            }
         }
         sortable.sort_by(|a, b| match a < b {
             true => Ordering::Greater,
             false => Ordering::Less,
         });
-
-        let count_fh = sortable.first().expect("to have at least one item");
+        let count_fh = *sortable.first().unwrap_or(&0);
         let count_sh = sortable.get(1).unwrap_or(&0);
-        if count_fh + count_sh == 5 && *count_sh  != 0 && *count_sh != 1 {
-            self.hand_type = HandType::FullHouse;
-        } else if *count_fh == 2 && *count_sh == 2 {
-            self.hand_type = HandType::TwoPair;
-        } else {
-            self.hand_type = HandType::get_by_count(*count_fh);
+
+        match count_jays {
+            5 => self.hand_type = HandType::FiveOfAKind,
+            4 => self.hand_type = HandType::FiveOfAKind,
+            3 => {
+                if count_fh == 2 {
+                    self.hand_type = HandType::FiveOfAKind;
+                } else if count_fh == 1 {
+                    self.hand_type = HandType::FourOfAKind;
+                }
+            }
+            2 => {
+                if count_fh == 3 {
+                    self.hand_type = HandType::FiveOfAKind;
+                } else if count_fh == 2 {
+                    self.hand_type = HandType::FourOfAKind;
+                } else if count_fh == 1 {
+                    self.hand_type = HandType::ThreeOfAKind;
+                }
+            }
+            1 => {
+                if count_fh == 4 {
+                    self.hand_type = HandType::FiveOfAKind;
+                } else if count_fh == 3 {
+                    self.hand_type = HandType::FourOfAKind;
+                } else if count_fh == 2 && *count_sh == 2 {
+                    self.hand_type = HandType::FullHouse;
+                } else if count_fh == 2 {
+                    self.hand_type = HandType::ThreeOfAKind;
+                } else if count_fh == 1 {
+                    self.hand_type = HandType::OnePair;
+                }
+            }
+            _ => {}
+        }
+
+        if self.hand_type == HandType::Unknown {
+            if count_fh == 0 {
+                self.hand_type = HandType::FiveOfAKind;
+            } else if count_fh + count_sh == 5 && *count_sh != 0 && *count_sh != 1 {
+                self.hand_type = HandType::FullHouse;
+                if count_jays > 0 {
+                    self.hand_type = HandType::FourOfAKind;
+                }
+            } else if count_fh == 2 && *count_sh == 2 {
+                self.hand_type = HandType::TwoPair;
+                if count_jays > 0 {
+                    self.hand_type = HandType::ThreeOfAKind;
+                }
+            } else {
+                self.hand_type = HandType::get_by_count(count_fh);
+            }
         }
     }
 
@@ -170,7 +222,7 @@ fn read_file_line_by_line(
 fn main() {
     let mut hands: Vec<Hand> = Vec::new();
     let order: Vec<char> = vec![
-        'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
+        'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J',
     ];
     let _ = read_file_line_by_line("src/day7_input", &mut hands);
 
