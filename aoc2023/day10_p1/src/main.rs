@@ -55,7 +55,11 @@ fn find_farthest_point(data: &mut [char; ARRAY_SIZE]) -> u32 {
     farthest_point
 }
 
-fn find_next_points(data: &mut [char; ARRAY_SIZE], start_x: isize, start_y: isize) -> Vec<(usize, usize)> {
+fn find_next_points(
+    data: &mut [char; ARRAY_SIZE],
+    start_x: isize,
+    start_y: isize,
+) -> Vec<(usize, usize)> {
     let mut next_points: Vec<(usize, usize)> = Vec::new();
 
     let points_to_check = vec![
