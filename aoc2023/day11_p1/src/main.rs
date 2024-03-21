@@ -114,6 +114,10 @@ fn main() {
         return;
     };
     let (data, height, width) = expand_empty_rows_and_cols(&data, height, width);
+    // TODO: get all galaxy combinations (36 with test data)
+    // TODO: get shortest path for all combinations (maybe just substract heigher coords from lower
+    // coords
+    // TODO: add up all sortest path to reach the sum (in the test example its 374)
 
     for y in 0..height {
         for x in 0..width {
