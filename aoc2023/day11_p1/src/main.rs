@@ -1,7 +1,27 @@
 use std::{
+    collections::BTreeMap,
     fs::File,
     io::{BufRead, BufReader},
 };
+
+#[derive(Debug, Clone, Copy)]
+struct Point {
+    x: usize,
+    y: usize,
+}
+
+impl Point {
+    fn new(x: usize, y: usize) -> Self {
+        Point { x, y }
+    }
+
+    fn distance(&self, other: &Point) -> u32 {
+        let x = self.x as i32 - other.x as i32;
+        let y = self.y as i32 - other.y as i32;
+
+        (x.abs() + y.abs()) as u32
+    }
+}
 
 fn read_file_line_by_line(
     filepath: &str,
@@ -10,20 +30,14 @@ fn read_file_line_by_line(
     let file = File::open(filepath)?;
     let reader = BufReader::new(file);
 
-    let mut width = 0;
-    let mut height = 0;
-    let mut index = 1;
+    let mut width: usize = 0;
+    let mut height: usize = 0;
     for line in reader.lines() {
         let line = line.unwrap();
 
-        let mut count = 0;
+        let mut count: usize = 0;
         for (_, c) in line.chars().enumerate() {
-            if c == '#' {
-                data.push(std::char::from_digit(index, 10).unwrap());
-                index += 1;
-            } else {
-                data.push(c);
-            }
+            data.push(c);
             count += 1;
         }
         if count > width {
@@ -107,6 +121,35 @@ fn expand_empty_rows_and_cols(
     (grid, new_height, new_width)
 }
 
+fn find_points(data: &Vec<char>, height: usize, width: usize) -> BTreeMap<u32, Point> {
+    let mut points: BTreeMap<u32, Point> = BTreeMap::new();
+
+    let mut index = 1;
+    for y in 0..height {
+        for x in 0..width {
+            if data[y * width + x] == '#' {
+                points.insert(index, Point::new(x, y));
+                index += 1;
+            }
+        }
+    }
+
+    points
+}
+
+fn calculate_shortest_paths(points: &BTreeMap<u32, Point>) -> u32 {
+    let mut sum: u32 = 0;
+    for i in 1..points.len() + 1 {
+        for j in i + 1..points.len() + 1 {
+            let a = points.get(&(i as u32)).unwrap();
+            let b = points.get(&(j as u32)).unwrap();
+            sum += b.distance(a);
+        }
+    }
+
+    sum
+}
+
 fn main() {
     let mut data: Vec<char> = Vec::new();
     let Ok((height, width)) = read_file_line_by_line("src/day11_calib", &mut data) else {
@@ -114,15 +157,8 @@ fn main() {
         return;
     };
     let (data, height, width) = expand_empty_rows_and_cols(&data, height, width);
-    // TODO: get all galaxy combinations (36 with test data)
-    // TODO: get shortest path for all combinations (maybe just substract heigher coords from lower
-    // coords
-    // TODO: add up all sortest path to reach the sum (in the test example its 374)
+    let points = find_points(&data, height, width);
+    let sum = calculate_shortest_paths(&points);
 
-    for y in 0..height {
-        for x in 0..width {
-            print!("{}", data[y * width + x]);
-        }
-        println!();
-    }
+    println!("Sum: {}", sum);
 }
