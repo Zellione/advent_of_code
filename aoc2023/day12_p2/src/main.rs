@@ -43,16 +43,17 @@ fn read_file_line_by_line(
 fn find_possibilities(row: &Row, mut pattern: String) -> u32 {
     let mut count: u32 = 0;
 
-    for i in 0..pattern.len() {
-        if (pattern.as_bytes()[i] as char) != '?' {
-            continue;
+    let index = pattern.find("?");
+    match index {
+        Some(i) => {
+            pattern.replace_range(i..i + 1, "#");
+            count += find_possibilities(row, pattern.clone());
+
+            pattern.replace_range(i..i + 1, ".");
+            return count + find_possibilities(row, pattern.clone());
         }
+        None => (),
 
-        pattern.replace_range(i..i + 1, "#");
-        count += find_possibilities(row, pattern.clone());
-
-        pattern.replace_range(i..i + 1, ".");
-        return count + find_possibilities(row, pattern.clone());
     }
 
     if row.is_valid(&pattern) {
