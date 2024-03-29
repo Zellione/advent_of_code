@@ -15,6 +15,7 @@ dependencies = [
 name = "day12_p2"
 version = "0.1.0"
 dependencies = [
+ "pipeliner",
  "regex",
 ]
 
@@ -23,6 +24,12 @@ name = "memchr"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "523dc4f511e55ab87b694dc30d0f820d60906ef06413f93d4d7a1385599cc149"
+
+[[package]]
+name = "pipeliner"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c65cbe097ddbf8099ac593aa7bfa4ae1204229e36db2261b0af5efab582516d5"
 
 [[package]]
 name = "regex"
