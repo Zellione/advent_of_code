@@ -1,9 +1,6 @@
 use row::Row;
 use std::{
-    collections::HashMap,
-    fs::File,
-    io::{BufRead, BufReader},
-    time::Instant,
+    collections::HashMap, fs::File, io::{BufRead, BufReader}, path::Path, time::Instant
 };
 
 mod row;
@@ -12,7 +9,12 @@ fn read_file_line_by_line(
     filepath: &str,
     data: &mut Vec<Row>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::open(filepath)?;
+    let path = Path::new(filepath);
+    let display = path.display();
+    let file = match File::open(path) {
+        Err(why) => panic!("couldn't open {}: {}", display, why),
+        Ok(file) => file
+    };
     let reader = BufReader::new(file);
 
     for line in reader.lines() {
