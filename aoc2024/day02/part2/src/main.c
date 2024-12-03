@@ -13,9 +13,7 @@ int parse_input(const char* line, const int line_length, int* numbers, const int
     {
         if (line[i] != ' ' && line[i] != '\n' & line[i] != '\0')
         {
-            // assert(buffer_index < 3);
-            if (buffer_index >= 3)
-                printf("%c", line[i]);
+            assert(buffer_index < 3);
 
             buffer[buffer_index] = line[i];
             buffer_index++;
@@ -53,7 +51,7 @@ int check(int* numbers, int length)
     }
     printf("\n");
     int direction = 0;
-    for (int i = 0; i < length - 2; i++)
+    for (int i = 0; i < length - 1; i++)
     {
         int delta = numbers[i] - numbers[i + 1];
 
@@ -109,15 +107,16 @@ bool try_all_faulty_indices(int* numbers, int length)
     cpy_array(numbers, tmp_numbers, length);
     tmp_length = length;
 
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i <= length; i++)
     {
-        int result = check(tmp_numbers, length);
+        int result = check(tmp_numbers, tmp_length);
         if (result == -1)
             return true;
 
+        printf(" Element to remove: %i \n", numbers[i]);
         cpy_array(numbers, tmp_numbers, length);
         tmp_length = length;
-        tmp_length = remove_element(numbers, length, result);
+        tmp_length = remove_element(tmp_numbers, tmp_length, i);
     }
 
     return false;
