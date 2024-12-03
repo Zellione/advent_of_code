@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,14 +11,18 @@ int parse_input(const char* line, const int line_length, int* numbers, const int
 
     for (int i = 0; i < line_length; i++)
     {
-        if (line[i] != ' ' && line[i] != '\n')
+        if (line[i] != ' ' && line[i] != '\n' & line[i] != '\0')
         {
+            // assert(buffer_index < 3);
+            if (buffer_index >= 3)
+                printf("%c", line[i]);
+
             buffer[buffer_index] = line[i];
             buffer_index++;
         }
         else
         {
-            if (numbers_parsed == length)
+            if (numbers_parsed == length || line[i] == '\0')
                 break;
 
             buffer[buffer_index + 1] = '\0';
@@ -25,6 +30,7 @@ int parse_input(const char* line, const int line_length, int* numbers, const int
 
             numbers[numbers_parsed]  = tmp;
             numbers_parsed++;
+
             for (int j = 0; j < buffer_index; j++)
             {
                 buffer[j] = 0;
@@ -36,6 +42,9 @@ int parse_input(const char* line, const int line_length, int* numbers, const int
     return numbers_parsed;
 }
 
+/**
+ * It was obvious but we need to brute force check if by removing all falty indexes
+ */
 int check(int* numbers, int length)
 {
     for (int i = 0; i < length; i++)
@@ -52,14 +61,24 @@ int check(int* numbers, int length)
             direction = delta > 0 ? 1 : -1;
 
         int udelta = abs(delta);
-        printf("\tDelta: %i Direction: %i Current: %i Previous %i\n", delta, direction, numbers[i + 1], numbers[i]);
+        // printf("\tDelta: %i Direction: %i Current: %i Previous %i\n", delta, direction, numbers[i + 1], numbers[i]);
         if (udelta > 3 || udelta < 1 || (delta < 0 && direction == 1) || (delta > 0 && direction == -1))
         {
-            return i + 1;
+            printf("... fail\n");
+            return i;
         }
     }
 
+    printf("... pass\n");
     return -1;
+}
+
+void cpy_array(int* source, int* target, const int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        target[i] = source[i];
+    }
 }
 
 int remove_element(int* numbers, int length, int element)
@@ -67,9 +86,11 @@ int remove_element(int* numbers, int length, int element)
     int tmp_nums[10];
     for (int i = 0; i < length; i++)
     {
-        if (i == element)
-            continue;
-        tmp_nums[i] = numbers[i];
+        int tmp_index = i;
+        if (i >= element)
+            tmp_index += 1;
+
+        tmp_nums[i] = numbers[tmp_index];
     }
 
     for (int i = 0; i < length - 1; i++)
@@ -80,28 +101,39 @@ int remove_element(int* numbers, int length, int element)
     return length - 1;
 }
 
+bool try_all_faulty_indices(int* numbers, int length)
+{
+    int tmp_numbers[10];
+    int tmp_length = 0;
+
+    cpy_array(numbers, tmp_numbers, length);
+    tmp_length = length;
+
+    for (int i = 0; i < length; i++)
+    {
+        int result = check(tmp_numbers, length);
+        if (result == -1)
+            return true;
+
+        cpy_array(numbers, tmp_numbers, length);
+        tmp_length = length;
+        tmp_length = remove_element(numbers, length, result);
+    }
+
+    return false;
+}
+
 int calculate(const char* line, int length)
 {
     int numbers[10]     = {0};
     int numbers_in_line = parse_input(line, length, numbers, 10);
 
-    // for (int i = 0; i < numbers_in_line; i++)
-    // {
-    //     printf("%i\t", numbers[i]);
-    // }
-    printf("\n");
-    int index = check(numbers, numbers_in_line);
-    if (index == -1)
+    bool result         = try_all_faulty_indices(numbers, numbers_in_line);
+
+    if (result)
         return 1;
 
-    // printf("Length: %i\t", numbers_in_line);
-    numbers_in_line = remove_element(numbers, numbers_in_line, index);
-    // printf("Length: %i\n", numbers_in_line);
-    index           = check(numbers, numbers_in_line);
-    if (index != -1)
-        return 0;
-
-    return 1;
+    return 0;
 }
 
 int main(int argc, char* argv[])
@@ -113,8 +145,8 @@ int main(int argc, char* argv[])
     size_t len     = 0;
     ssize_t read;
 
-    // fp = fopen("../../../day2_input", "r");
-    fp = fopen("../../input_test", "r");
+    fp = fopen("../../../day2_input", "r");
+    // fp = fopen("../../input_test", "r");
 
     if (fp == NULL)
         exit(EXIT_FAILURE);
