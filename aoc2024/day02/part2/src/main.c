@@ -11,7 +11,7 @@ int parse_input(const char* line, const int line_length, int* numbers, const int
 
     for (int i = 0; i < line_length; i++)
     {
-        if (line[i] != ' ' && line[i] != '\n' & line[i] != '\0')
+        if (line[i] != ' ' && line[i] != '\n' && line[i] != '\0')
         {
             assert(buffer_index < 3);
 
