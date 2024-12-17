@@ -7,12 +7,12 @@
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
-#define TEST
+// #define TEST
 
-#define WORD_LENGTH 3
+#define PAGES_INDEX_MAX 30
 #ifndef TEST
-#define INPUT_FILE "../../../day4_input"
-#define DEPDENCY_ORDER_MAX 1200
+#define INPUT_FILE "../../../day5_input"
+#define DEPENDENCY_ORDER_MAX 1200
 #else
 #define INPUT_FILE "../../input_test"
 #define DEPENDENCY_ORDER_MAX 25
@@ -23,6 +23,13 @@ struct DependencyOrderItem
     int page_number;
     int requirement;
 };
+
+void swap(int* a, int* b)
+{
+    int tmp = *a;
+    *a      = *b;
+    *b      = tmp;
+}
 
 void read_dependency(char* line, struct DependencyOrderItem** dependency_order_array, int* current_index)
 {
@@ -45,12 +52,77 @@ void read_dependency(char* line, struct DependencyOrderItem** dependency_order_a
     *current_index += 1;
 }
 
+int find_dependency(int page_number, struct DependencyOrderItem** dependency_order_item, int doi_count,
+                    int* start_index)
+{
+    for (int i = *start_index; i < doi_count; i++)
+    {
+        if (dependency_order_item[i]->page_number == page_number)
+        {
+            *start_index = i + 1;
+            return dependency_order_item[i]->requirement;
+        }
+    }
+
+    return -1;
+}
+
+int get_position(int* pages, int pages_count, int number)
+{
+    for (int i = 0; i < pages_count; i++)
+    {
+        if (pages[i] == number)
+            return i;
+    }
+
+    return -1;
+}
+
+bool is_valid(int* pages, int pages_count, struct DependencyOrderItem** dependency_order_item, int doi_count)
+{
+    for (int i = 0; i < pages_count; i++)
+    {
+        int cur_dependency = 0;
+        int dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
+        int dependency_pos = get_position(pages, pages_count, dependency);
+        while (dependency > -1)
+        {
+            if (i < dependency_pos && dependency_pos != -1)
+            {
+                return false;
+            }
+
+            dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
+            dependency_pos = get_position(pages, pages_count, dependency);
+        }
+    }
+
+    return true;
+}
+
+int retrieve_middle_page_number(int* pages, int page_count)
+{
+    // printf("%i\n", pages[page_count / 2]);
+    return pages[page_count / 2];
+}
+
 int read_pages(char* line, struct DependencyOrderItem** dependency_order_array, int current_index)
 {
-    // TODO: move this dependency order check into a seperate function
-    for (int i = 0; i < current_index; i++)
+    int pages[PAGES_INDEX_MAX] = {0};
+    int pages_index            = 0;
+
+    char* token = strtok(line, ",");
+    while (token)
     {
-        printf("%i %i\n", dependency_order_array[i]->page_number, dependency_order_array[i]->requirement);
+        assert(pages_index < PAGES_INDEX_MAX);
+        pages[pages_index] = atoi(token);
+        token              = strtok(NULL, ",");
+        pages_index++;
+    }
+
+    if (is_valid(pages, pages_index, dependency_order_array, current_index))
+    {
+        return retrieve_middle_page_number(pages, pages_index);
     }
 
     return 0;
@@ -66,8 +138,7 @@ int main(int argc, char* argv[])
 
     struct DependencyOrderItem* dependency_order[DEPENDENCY_ORDER_MAX];
     int dependency_order_count = 0;
-
-    fp = fopen(INPUT_FILE, "r");
+    fp                         = fopen(INPUT_FILE, "r");
 
     if (fp == NULL)
         exit(EXIT_FAILURE);
