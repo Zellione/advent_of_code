@@ -78,31 +78,40 @@ int get_position(int* pages, int pages_count, int number)
     return -1;
 }
 
-bool is_valid(int* pages, int pages_count, struct DependencyOrderItem** dependency_order_item, int doi_count)
-{
-    for (int i = 0; i < pages_count; i++)
-    {
-        int cur_dependency = 0;
-        int dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
-        int dependency_pos = get_position(pages, pages_count, dependency);
-        while (dependency > -1)
-        {
-            if (i < dependency_pos && dependency_pos != -1)
-            {
-                return false;
-            }
-
-            dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
-            dependency_pos = get_position(pages, pages_count, dependency);
-        }
-    }
-
-    return true;
-}
-
 int retrieve_middle_page_number(int* pages, int page_count)
 {
     return pages[page_count / 2];
+}
+
+bool sort_by_dependency_order(int* pages, int pages_count, struct DependencyOrderItem** dependency_order_item,
+                              int doi_count)
+{
+    bool valid       = true;
+    bool has_changed = false;
+    do
+    {
+        has_changed = false;
+        for (int i = 0; i < pages_count; i++)
+        {
+            int cur_dependency = 0;
+            int dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
+            int dependency_pos = get_position(pages, pages_count, dependency);
+            while (dependency > 0)
+            {
+                if (i < dependency_pos && dependency_pos != -1)
+                {
+                    swap(&pages[i], &pages[dependency_pos]);
+                    has_changed = true;
+                    valid       = false;
+                }
+
+                dependency     = find_dependency(pages[i], dependency_order_item, doi_count, &cur_dependency);
+                dependency_pos = get_position(pages, pages_count, dependency);
+            }
+        }
+    } while (has_changed);
+
+    return valid;
 }
 
 int read_pages(char* line, struct DependencyOrderItem** dependency_order_array, int current_index)
@@ -119,12 +128,15 @@ int read_pages(char* line, struct DependencyOrderItem** dependency_order_array, 
         pages_index++;
     }
 
-    if (is_valid(pages, pages_index, dependency_order_array, current_index))
+    bool valid = sort_by_dependency_order(pages, pages_index, dependency_order_array, current_index);
+    if (!valid)
     {
-        return retrieve_middle_page_number(pages, pages_index);
+        for (int i = 0; i < pages_index; i++)
+            printf("%i\t", pages[i]);
+        printf("\n");
     }
 
-    return 0;
+    return valid ? 0 : retrieve_middle_page_number(pages, pages_index);
 }
 
 int main(int argc, char* argv[])
