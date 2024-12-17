@@ -129,12 +129,6 @@ int read_pages(char* line, struct DependencyOrderItem** dependency_order_array, 
     }
 
     bool valid = sort_by_dependency_order(pages, pages_index, dependency_order_array, current_index);
-    if (!valid)
-    {
-        for (int i = 0; i < pages_index; i++)
-            printf("%i\t", pages[i]);
-        printf("\n");
-    }
 
     return valid ? 0 : retrieve_middle_page_number(pages, pages_index);
 }
