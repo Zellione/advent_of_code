@@ -34,4 +34,22 @@ dap.configurations.c = {
 		stopOnEntry = false,
 		args = {},
 	},
+	{
+		name = "Launch Day5 Part2 Debug",
+		type = "lldb",
+		request = "launch",
+		program = vim.fn.getcwd() .. "/aoc2024/day05/part2/build/default/advent_of_code_day5_part2",
+		cwd = "${workspaceFolder}/aoc2024/day05/part2/build/default",
+		stopOnEntry = false,
+		args = {},
+	},
+	{
+		name = "Launch Day6 Part1 Debug",
+		type = "lldb",
+		request = "launch",
+		program = vim.fn.getcwd() .. "/aoc2024/day06/part1/build/default/advent_of_code_day6_part1",
+		cwd = "${workspaceFolder}/aoc2024/day06/part1/build/default",
+		stopOnEntry = false,
+		args = {},
+	},
 }
