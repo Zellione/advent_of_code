@@ -10,6 +10,6 @@ file (GLOB_RECURSE source_files "${source_dir}/*.c")
 
 message(STATUS "source_files=${source_files}")
 
-add_executable (advent_of_code_day5_part1 ${source_files})
+add_executable (advent_of_code_day5_part2 ${source_files})
 
-target_link_libraries(advent_of_code_day5_part1)
+target_link_libraries(advent_of_code_day5_part2)
